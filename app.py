@@ -21,14 +21,18 @@ st.caption("A free, open-source RAG chatbot powered by Hugging Face models")
 def load_embeddings():
     return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
+
 @st.cache_resource
 def load_model():
     llm_endpoint = HuggingFaceEndpoint(
-        repo_id="Qwen/Qwen2.5-7B-Instruct",
+        repo_id="meta-llama/Llama-3.1-8B-Instruct",
+        task="conversational",
+        provider="auto",
         temperature=0.3,
         max_new_tokens=512,
     )
     return ChatHuggingFace(llm=llm_endpoint)
+
 
 embeddings = load_embeddings()
 model = load_model()
@@ -40,7 +44,6 @@ if "db" not in st.session_state:
     st.session_state.db = Chroma(
         persist_directory="db/chroma_db",
         embedding_function=embeddings,
-        collection_metadata={"hnsw:space": "cosine"}
     )
 
 if "chat_history" not in st.session_state:
@@ -158,3 +161,13 @@ if user_input:
             st.markdown(answer)
 
     st.session_state.display_history.append(("assistant", answer))
+
+
+# 1. "What was NVIDIA's first graphics accelerator called?"
+# 2. "Which company did NVIDIA acquire to enter the mobile processor market?"
+# 3. "What was Microsoft's first hardware product release?"
+# 4. "How much did Microsoft pay to acquire GitHub?"
+# 5. "In what year did Tesla begin production of the Roadster?"
+# 6. "Who succeeded Ze'ev Drori as CEO in October 2008?"
+# 7. "What was the name of the autonomous spaceport drone ship that achieved the first successful sea landing?"
+# 8. "What was the original name of Microsoft before it became Microsoft?"
